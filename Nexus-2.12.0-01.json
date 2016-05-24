@@ -1,0 +1,45 @@
+{
+	"jpsVersion": "0.2",
+	"jpsType": "install",
+	"application": {
+		"id": "nexus",
+		"name": "Nexus Repository Manager",
+		"version": "2.12.0-01",
+		"logo": "https://raw.githubusercontent.com/JelasticJPS/Nexus/master/images/Nexus.png",
+		"type": "java",
+		"homepage": "http://www.sonatype.org/",
+		"categories": ["apps/dev-tools", "apps/dev-and-admin-tools"],
+		"description": {
+			"en": "Nexus sets the standard for repository management providing development teams with the ability to proxy remote repositories and share software artifacts."
+		},
+		"env": {
+			"topology": {
+				"ha": false,
+				"engine": "java7",
+				"ssl": false,
+				"nodes": [{
+						"extip": false,
+						"count": 1,
+						"cloudlets": 16,
+						"nodeType": "tomcat7"
+					}
+				]
+			},
+			"deployments": [{
+					"archive": "https://raw.githubusercontent.com/JelasticJPS/Nexus/master/dumps/nexus-2.12.0-01.war",
+					"name": "nexus-2.12.0-01.war",
+					"context": "ROOT"
+				}
+			],
+			"configs": [{
+					"nodeType": "tomcat7",
+					"restart": true
+				}
+			]
+		},
+		"success": {
+			"text": "Below you will find your admin panel link, username and password.</br></br> <table style='font-size:13px; border: none;'><tr><td>Admin panel URL:</td><td style='padding-left: 10px;'><a href='${env.protocol}://${env.domain}/' target='_blank'>${env.protocol}://${env.domain}/</a></td></tr>  <tr><td>Admin name:</td><td style='padding-left: 10px;'>admin</td></tr><tr><td>Password:</td><td style='padding-left: 10px;'>admin123</td></tr></table></br>To add custom domain name for your Nexus Repository Manager installation follow the steps described in our <a href='http://docs.jelastic.com/custom-domains' target='_blank'>documentation</a>",
+			"email": "Below you will find your admin panel link, username and password.</br></br> <table style='font-size:13px; border: none;'><tr><td>Admin panel URL:</td><td style='padding-left: 10px;'><a href='${env.protocol}://${env.domain}/' target='_blank'>${env.protocol}://${env.domain}/</a></td></tr>  <tr><td>Admin name:</td><td style='padding-left: 10px;'>admin</td></tr><tr><td>Password:</td><td style='padding-left: 10px;'>admin123</td></tr></table></br>To add custom domain name for your Nexus Repository Manager installation follow the steps described in our <a href='http://docs.jelastic.com/custom-domains' target='_blank'>documentation</a>"
+		}
+	}
+}
