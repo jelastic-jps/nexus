@@ -1,7 +1,6 @@
 # Jelastic Nexus Repository Manager Add-on
 
 This repository provides [Nexus Repository Manager](http://www.sonatype.org/) add-on for Jelastic Platform.
-[![GET IT HOSTED](https://raw.githubusercontent.com/JelasticJPS/Nexus/master/images/getithosted.png)](http://go.jelastic.com/test?hoster-select=1&theme=modern&app=https://raw.githubusercontent.com/JelasticJPS/Nexus/master/Nexus-2.12.0-01.json)
 
 **Nexus Repository Manager** sets the standard for repository management providing development teams with the ability to proxy remote repositories and share software artifacts.
 
