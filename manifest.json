@@ -5,7 +5,7 @@
 		"id": "nexus",
 		"name": "Nexus Repository Manager",
 		"version": "2.12.0-01",
-		"logo": "https://raw.githubusercontent.com/JelasticJPS/Nexus/master/images/Nexus.png",
+		"logo": "https://raw.githubusercontent.com/jelastic-jps/Nexus/master/images/Nexus.png",
 		"type": "java",
 		"homepage": "http://www.sonatype.org/",
 		"categories": ["apps/dev-tools", "apps/dev-and-admin-tools"],
@@ -26,7 +26,7 @@
 				]
 			},
 			"deployments": [{
-					"archive": "https://raw.githubusercontent.com/JelasticJPS/Nexus/master/dumps/nexus-2.12.0-01.war",
+					"archive": "https://raw.githubusercontent.com/jelastic-jps/Nexus/master/dumps/nexus-2.12.0-01.war",
 					"name": "nexus-2.12.0-01.war",
 					"context": "ROOT"
 				}
