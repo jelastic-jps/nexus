@@ -1,35 +1,40 @@
-# Jelastic Nexus Repository Manager Add-on
+[![Nexus Repository Manager](images/logo-nexus.png)](../../../nexus)
 
-This repository provides [Nexus Repository Manager](http://www.sonatype.org/) add-on for Jelastic Platform.
+## Nexus Repository Manager
 
-**Nexus Repository Manager** sets the standard for repository management providing development teams with the ability to proxy remote repositories and share software artifacts.
+The JPS package deploys [Nexus Repository Manager](http://www.sonatype.org/) that initially contains 1 application server. 
 
-**Type of nodes this add-on can be applied to**:
-- tomcat7
-- java7
-
-### What it can be used for?
-Nexus sets the standard for repository management providing development teams with the ability to proxy remote repositories and share software artifacts.
-
+### Highlights
+This package is designed to deploy Nexus Repository Manager environment is a free repository manager with universal support for popular component formats.
+  -  Basic component intelligence
+  -  Supports Maven, Docker, NuGet, npm, PyPI, Bower, and more<br />
+Nexus Repository Manager sets the standard for repository management providing development teams with the ability to proxy remote repositories and share software artifacts.
 
 
-### What Jelastic add-on is?
+### Environment Topology
 
-Jelastic add-on represents a package with a kind of a patch, that can be applied to an environment in order to improve and complement its functionality. The full list of the available at a platform add-ons can be seen at the corresponding same-named section of [Jelastic Marketplace](https://docs.jelastic.com/marketplace#add-ons].
+![Nexus Repository Manager Topology](https://docs.google.com/drawings/d/1liCNRpMQ5s6ys67C_6-ldy-nKzw2ngaBsr8hRgvB-T0/pub?w=276&h=216)
 
-### How to install an add-on?
-###### For Developers
+### Specifics
 
-In case you can’t find the desired package within the list of available ones, copy and save the content of add-on’s manifest as a *.json* file and [import](https://docs.jelastic.com/environment-export-import#import) it to the dashboard. Herewith, you can apply any necessary adjustments to an add-on through this file (if such are required) and install its customized version in the similar way.
+Layer                |     Server    | Number of CTs <br/> by default | Cloudlets per CT <br/> (reserved/dynamic) | Options
+-------------------- | --------------| :----------------------------: | :---------------------------------------: | :-----:
+AS                   | Tomcat Java |       1                        |           1 / 16                          | -
 
-###### For Cluster Admins
+* AS - Application server 
+* DB - Database 
+* CT - Container
 
-In order to add the desired add-on to your platform and make it available for users, perform the following:
-- copy the content of its manifest 
-- switch to the [Marketplace](http://ops-docs.jelastic.com/marketplace-46) section of your JCA panel and choose **Add > Add-on** menu option
-- paste the copied strings into the appeared frame and **Save** the template
-- choose your newly added add-on within the list and click on **Publish** above
+**Nexus Repository Manager**: OSS 2.12.0-01<br/>
+**Tomcat Version**: 7.0.67<br/>
+**Java Engine**: Java 7
 
-Also, you are able to adjust the given add-on template according to your needs and provide its customized version.
+### Deployment
 
+In order to get this solution instantly deployed, click the "Get It Hosted Now" button, specify your email address within the widget, choose one of the [Jelastic Public Cloud providers](https://jelastic.cloud) and press Install.
 
+[![GET IT HOSTED](https://raw.githubusercontent.com/jelastic-jps/jpswiki/master/images/getithosted.png)](https://jelastic.com/install-application/?manifest=https%3A%2F%2Fgithub.com%2Fjelastic-jps%2Fnexus%2Fraw%2Fmaster%2Fmanifest.jps)
+
+To deploy this package to Jelastic Private Cloud, import [this JPS manifest](../../raw/master/manifest.jps) within your dashboard ([detailed instruction](https://docs.jelastic.com/environment-export-import#import)).
+
+More information about Jelastic JPS package and about installation widget for your website can be found in the [Jelastic JPS Application Package](https://github.com/jelastic-jps/jpswiki/wiki/Jelastic-JPS-Application-Package) reference.
