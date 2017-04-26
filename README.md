@@ -13,7 +13,7 @@ Nexus Repository Manager sets the standard for repository management providing d
 
 ### Environment Topology
 
-![Nexus Repository Manager Topology](https://docs.google.com/drawings/d/1liCNRpMQ5s6ys67C_6-ldy-nKzw2ngaBsr8hRgvB-T0/pub?w=276&h=216)
+![nexus-environment-topology](images/nexus-environment-topology.png)
 
 ### Specifics
 
