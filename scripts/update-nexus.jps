@@ -1,0 +1,25 @@
+type: update
+name: Nexus Server Upgrade 
+logo: https://raw.githubusercontent.com/jelastic-jps/nexus/master/images/Nexus.png
+
+description: |
+  This Addon allows you to upgrade Nexus and CentOS.  
+
+targetNodes:
+  nodeGroup: [cp]
+ 
+onInstall:
+  - update-packages
+  - restart
+
+actions:
+  update-packages:
+    - log: update of Centos
+    - cmd [cp]: yum -y update &>> /var/log/run.log
+      user: root
+      sayYes: true
+  restart:
+    - api [cp]: jelastic.environment.control.RestartNodes 
+
+success:
+  text: Nexus and CentOS have been updated
