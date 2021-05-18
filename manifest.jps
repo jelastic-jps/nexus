@@ -1,77 +1,75 @@
-type: install 
+type: install
 version: 0.2
 name: Nexus Repository Manager
 baseUrl: https://raw.githubusercontent.com/jelastic-jps/nexus/master/
 logo: images/Nexus.png
 homepage: https://www.sonatype.com/products/repository-oss
-description: Nexus Repository OSS is an open source repository that supports many artifact formats, including Docker, Java and npm. 
-  With the Nexus tool integration, pipelines in your toolchain can publish and retrieve versioned apps and their dependencies by using central repositories that are accessible from other environments.
+description: Nexus Repository OSS is an open source repository that supports many
+  artifact formats, including Docker, Java and npm. With the Nexus tool integration,
+  pipelines in your toolchain can publish and retrieve versioned apps and their dependencies
+  by using central repositories that are accessible from other environments.
 
 categories:
-  - apps/dev-tools
-  - apps/dev-and-admin-tools
+- apps/dev-tools
+- apps/dev-and-admin-tools
 
-env:
-  ssl: true
-  nodes:
-  - cloudlets: 32
-    fixedCloudlets: 1
-    nodeType: nginxphp
+ssl: true
+nodes:
+- cloudlets: 32
+  fixedCloudlets: 1
+  nodeType: nginxphp
 
 onInstall:
-	- install-nexus
-	- setup-nginx
-  - installAddon:
-      id: update-nexus
-      nodeGroup: cp
+- install-nexus
+- setup-nginx
+- installAddon:
+    id: update-nexus
+    nodeGroup: cp
 
 actions:
   install-nexus:
-		- cmd[cp]: |-
-        wget -P /etc/yum.repos.d/ https://repo.sonatype.com/repository/community-hosted/rpm/sonatype-community.repo &>> /var/log/run.log
-        yum -y update &>> /var/log/run.log
-        yum -y install nexus-repository-manager &>> /var/log/run.log
-        echo /opt/sonatype/ >> /etc/jelastic/redeploy.conf
-        sleep 10
-        chmod 664 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
-        usermod -a -G nexus3 jelastic
-      user: root
-      sayYes: true
-
+  - cmd[cp]: |-
+      wget -P /etc/yum.repos.d/ https://repo.sonatype.com/repository/community-hosted/rpm/sonatype-community.repo &>> /var/log/run.log
+      yum -y update &>> /var/log/run.log
+      yum -y install nexus-repository-manager &>> /var/log/run.log
+      echo /opt/sonatype/ >> /etc/jelastic/redeploy.conf
+      sleep 10
+      chmod 664 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
+      usermod -a -G nexus3 jelastic
+    user: root
+    sayYes: true
   setup-nginx:
-		- cmd[cp]: |-
-        sed -i '74d' /etc/nginx/nginx.conf
-        sed -i "74i 	 proxy_pass http://localhost:8081/;"  /etc/nginx/nginx.conf
-        sed -i '75i    proxy_set_header Host $host;'  /etc/nginx/nginx.conf
-        sed -i '76i    proxy_set_header X-Real-IP $remote_addr;'  /etc/nginx/nginx.conf
-        sed -i '77i    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'  /etc/nginx/nginx.conf
-      user: root
-      sayYes: true
-    - replaceInFile:
-      	nodeType: nginxphp
-      	path: /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
-      	replacements:
-        	- pattern: '# application-host=0.0.0.0'
-          	replacement: 'application-host=127.0.0.1'
-		- api [cp]: jelastic.environment.control.RestartNodes
-		- cmd [cp]: sleep 15
+  - cmd[cp]: |-
+      sed -i '74d' /etc/nginx/nginx.conf
+      sed -i "74i    proxy_pass http://localhost:8081/;"  /etc/nginx/nginx.conf
+      sed -i '75i    proxy_set_header Host $host;'  /etc/nginx/nginx.conf
+      sed -i '76i    proxy_set_header X-Real-IP $remote_addr;'  /etc/nginx/nginx.conf
+      sed -i '77i    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'  /etc/nginx/nginx.conf
+    user: root
+    sayYes: true
+  - replaceInFile:
+      nodeType: nginxphp
+      path: "/opt/sonatype/sonatype-work/nexus3/etc/nexus.properties"
+      replacements:
+      - pattern: "# application-host=0.0.0.0"
+        replacement: application-host=127.0.0.1
+  - api [cp]: jelastic.environment.control.RestartNodes
+  - cmd [cp]: sleep 15
 
 addons:
-  - id: update-nexus
-    name: Update Nexus Repository Manager
-    description: Update of Nexus and CentOS
-    buttons:
-      - caption: Update
-        action: update
-        loadingText: Updating...
-        confirmText: Do you want to update Nexus and CentOS?
-        successText: Nexus and CentOS have been successfully updated!
-    actions:
-      update:
-        - log: launching nexus update JPS
-        - install: https://raw.githubusercontent.com/jelastic-jps/nexus/master/scripts/update-nexus.jps
-          skipEmail: true
+- id: update-nexus
+  name: Update Nexus Repository Manager
+  description: Update of Nexus and CentOS
+  buttons:
+  - caption: Update
+    action: update
+    loadingText: Updating...
+    confirmText: Do you want to update Nexus and CentOS?
+    successText: Nexus and CentOS have been successfully updated!
+  actions:
+    update:
+    - log: launching nexus update JPS
+    - install: https://raw.githubusercontent.com/jelastic-jps/nexus/master/scripts/update-nexus.jps
+      skipEmail: true
 
-success:
-  email: text/success-email.md
-  text: text/success-text.md
+success: text/success-email.md
