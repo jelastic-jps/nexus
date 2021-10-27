@@ -40,11 +40,10 @@ actions:
     sayYes: true
   setup-nginx:
   - cmd[cp]: |-
-      sed -i '74d' /etc/nginx/nginx.conf
-      sed -i "74i    proxy_pass http://localhost:8081/;"  /etc/nginx/nginx.conf
-      sed -i '75i    proxy_set_header Host $host;'  /etc/nginx/nginx.conf
-      sed -i '76i    proxy_set_header X-Real-IP $remote_addr;'  /etc/nginx/nginx.conf
-      sed -i '77i    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'  /etc/nginx/nginx.conf
+      sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;|g' /etc/nginx/conf.d/sites-enabled/default.conf
+      sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header X-Real-IP $remote_addr;|g' /etc/nginx/conf.d/sites-enabled/default.conf
+      sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header Host $host;|g' /etc/nginx/conf.d/sites-enabled/default.conf
+      sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_pass http://localhost:8081/;|g' /etc/nginx/conf.d/sites-enabled/default.conf
     user: root
     sayYes: true
   - replaceInFile:
