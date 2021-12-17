@@ -1,5 +1,6 @@
 type: install
 version: 0.2
+id: nexus
 name: Nexus Repository Manager
 baseUrl: https://raw.githubusercontent.com/jelastic-jps/nexus/master/
 logo: images/Nexus.png
