@@ -32,7 +32,7 @@ actions:
   - cmd[cp]: |-
       wget -P /etc/yum.repos.d/ https://repo.sonatype.com/repository/community-hosted/rpm/sonatype-community.repo &>> /var/log/run.log
       yum -y update &>> /var/log/run.log
-      yum -y install nexus-repository-manager &>> /var/log/run.log
+      yum -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
       echo /opt/sonatype/ >> /etc/jelastic/redeploy.conf
       sleep 10
       chmod 664 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
