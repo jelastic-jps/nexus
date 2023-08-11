@@ -3,7 +3,7 @@ name: Nexus Server Upgrade
 logo: https://raw.githubusercontent.com/dimkadt/nexus/master/images/Nexus.png
 
 description: |
-  This Addon allows you to upgrade Nexus and CentOS.  
+  This Addon allows you to upgrade Nexus.
 
 targetNodes:
   nodeGroup: [cp]
@@ -14,12 +14,17 @@ onInstall:
 
 actions:
   update-packages:
-    - log: update of Centos
-    - cmd [cp]: yum -y update &>> /var/log/run.log
+    - log: update of Nexus
+    - cmd [cp]: |-
+         if grep -a 'AlmaLinux' /etc/system-release ; then
+          dnf -y update nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+         else
+          yum -y update nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+         fi
       user: root
       sayYes: true
   restart:
     - api [cp]: jelastic.environment.control.RestartNodes 
 
 success:
-  text: Nexus and CentOS have been updated
+  text: Nexus has been updated
