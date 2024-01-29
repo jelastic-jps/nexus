@@ -31,8 +31,11 @@ actions:
   install-nexus:
   - cmd[cp]: |-
       wget -P /etc/yum.repos.d/ https://repo.sonatype.com/repository/community-hosted/rpm/sonatype-community.repo &>> /var/log/run.log
-      yum -y update &>> /var/log/run.log
-      yum -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+      if grep -a 'AlmaLinux' /etc/system-release ; then
+       dnf -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+      else
+       yum -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+      fi
       echo /opt/sonatype/ >> /etc/jelastic/redeploy.conf
       sleep 10
       chmod 664 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
@@ -59,13 +62,13 @@ actions:
 addons:
 - id: update-nexus
   name: Update Nexus Repository Manager
-  description: Update of Nexus and CentOS
+  description: Update of Nexus
   buttons:
   - caption: Update
     action: update
     loadingText: Updating...
-    confirmText: Do you want to update Nexus and CentOS?
-    successText: Nexus and CentOS have been successfully updated!
+    confirmText: Do you want to update Nexus?
+    successText: Nexus has been successfully updated!
   actions:
     update:
     - log: launching nexus update JPS
