@@ -2,7 +2,7 @@ type: install
 version: 0.2
 id: nexus
 name: Nexus Repository Manager
-baseUrl: https://raw.githubusercontent.com/dimkadt/nexus/master/
+baseUrl: https://raw.githubusercontent.com/jelastic-jps/nexus/master/
 logo: images/Nexus.png
 homepage: https://www.sonatype.com/products/repository-oss
 description: Nexus Repository OSS is an open source repository that supports many
@@ -72,7 +72,7 @@ addons:
   actions:
     update:
     - log: launching nexus update JPS
-    - install: https://raw.githubusercontent.com/dimkadt/nexus/master/scripts/update-nexus.jps
+    - install: https://raw.githubusercontent.com/jelastic-jps/nexus/master/scripts/update-nexus.jps
       skipEmail: true
 
 success: text/success-email.md
