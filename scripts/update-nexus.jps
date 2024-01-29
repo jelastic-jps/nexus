@@ -1,6 +1,6 @@
 type: update
 name: Nexus Server Upgrade 
-logo: https://raw.githubusercontent.com/dimkadt/nexus/master/images/Nexus.png
+logo: https://raw.githubusercontent.com/jelastic-jps/nexus/master/images/Nexus.png
 
 description: |
   This Addon allows you to upgrade Nexus.
