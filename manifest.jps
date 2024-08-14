@@ -32,12 +32,26 @@ actions:
   - cmd[cp]: |-
       wget -P /etc/yum.repos.d/ https://repo.sonatype.com/repository/community-hosted/rpm/sonatype-community.repo &>> /var/log/run.log
       if grep -a 'AlmaLinux' /etc/system-release ; then
-       dnf -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+        dnf -y install nexus-repository-manager java-17-openjdk-headless --nogpgcheck &>> /var/log/run.log
+        update-alternatives --remove-all  java-1.8.0-openjdk.x86_64 &>> /var/log/run.log
+        systemctl restart nexus-repository-manager.service
       else
-       yum -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+        yum -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+        wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+        tar xf openjdk-17.0.2_linux-x64_bin.tar.gz
+        rm -f  openjdk-17.0.2_linux-x64_bin.tar.gz
+        mv jdk-17.0.2 /opt/
+        echo 'export JAVA_HOME=/opt/jdk-17.0.2' >>/etc/profile.d/jdk17.sh
+        echo 'export PATH=$PATH:$JAVA_HOME/bin' >>/etc/profile.d/jdk17.sh
+        echo /opt/jdk-17.0.2 >> /etc/jelastic/redeploy.conf
+        ln -sf /opt/jdk-17.0.2/bin/java /etc/alternatives/java
+        systemctl restart nexus-repository-manager.service
       fi
       echo /opt/sonatype/ >> /etc/jelastic/redeploy.conf
-      sleep 10
+      until [[ -f /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties ]] ; do
+          sleep 1
+          echo '.'
+      done
       chmod 664 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
       usermod -a -G nexus3 jelastic
     user: root
@@ -48,14 +62,10 @@ actions:
       sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header X-Real-IP $remote_addr;|g' /etc/nginx/conf.d/sites-enabled/default.conf
       sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header Host $host;|g' /etc/nginx/conf.d/sites-enabled/default.conf
       sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_pass http://localhost:8081/;|g' /etc/nginx/conf.d/sites-enabled/default.conf
+      sed -i 's|\#\s*application-host=.*|application-host=127.0.0.1|' /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
+      chown nexus3:nexus3 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
     user: root
     sayYes: true
-  - replaceInFile:
-      nodeType: nginxphp
-      path: "/opt/sonatype/sonatype-work/nexus3/etc/nexus.properties"
-      replacements:
-      - pattern: "# application-host=0.0.0.0"
-        replacement: application-host=127.0.0.1
   - api [cp]: jelastic.environment.control.RestartNodes
   - cmd [cp]: sleep 15
 
