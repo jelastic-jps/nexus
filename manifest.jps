@@ -32,11 +32,11 @@ actions:
   - cmd[cp]: |-
       wget -P /etc/yum.repos.d/ https://repo.sonatype.com/repository/community-hosted/rpm/sonatype-community.repo &>> /var/log/run.log
       if grep -a 'AlmaLinux' /etc/system-release ; then
-        dnf -y install nexus-repository-manager java-17-openjdk-headless --nogpgcheck &>> /var/log/run.log
+        dnf -y install nexus-repository-manager-3.68.1_02 java-17-openjdk-headless --nogpgcheck &>> /var/log/run.log
         update-alternatives --remove-all  java-1.8.0-openjdk.x86_64 &>> /var/log/run.log
         systemctl restart nexus-repository-manager.service
       else
-        yum -y install nexus-repository-manager --nogpgcheck &>> /var/log/run.log
+        yum -y install nexus-repository-manager-3.68.1_02 --nogpgcheck &>> /var/log/run.log
         wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
         tar xf openjdk-17.0.2_linux-x64_bin.tar.gz
         rm -f  openjdk-17.0.2_linux-x64_bin.tar.gz
