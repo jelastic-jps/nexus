@@ -18,6 +18,8 @@ categories:
 - apps/dev-and-admin-tools
 
 ssl: true
+skipNodeEmails: true
+
 nodes:
 - cloudlets: 32
   fixedCloudlets: 1
