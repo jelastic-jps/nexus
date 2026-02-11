@@ -10,6 +10,9 @@ description: Nexus Repository OSS is an open source repository that supports man
   pipelines in your toolchain can publish and retrieve versioned apps and their dependencies
   by using central repositories that are accessible from other environments.
 
+mixins:
+  - configs/vers.yaml
+
 categories:
 - apps/dev-tools
 - apps/dev-and-admin-tools
@@ -19,70 +22,63 @@ nodes:
 - cloudlets: 32
   fixedCloudlets: 1
   nodeType: nginxphp
+  displayName: Nexus Server
+- cloudlets: 16
+  nodeType: postgresql
+  displayName: Database Server
+  nodeGroup: sqldb
 
 onInstall:
+- setup-postgresql
 - install-nexus
+- setup-postgresql-connection
 - setup-nginx
-- installAddon:
-    id: update-nexus
-    nodeGroup: cp
 
 actions:
+  setup-postgresql:
+  - cmd[${nodes.sqldb.master.id}]: 
+      psql -Uwebadmin postgres -c "CREATE DATABASE nexus WITH ENCODING 'UNICODE' LC_COLLATE 'C' LC_CTYPE 'C' TEMPLATE template0;"
+  
   install-nexus:
   - cmd[cp]: |-
-      wget -P /etc/yum.repos.d/ https://repo.sonatype.com/repository/community-hosted/rpm/sonatype-community.repo &>> /var/log/run.log
-      if grep -a 'AlmaLinux' /etc/system-release ; then
-        dnf -y install nexus-repository-manager-3.68.1_02 java-17-openjdk-headless --nogpgcheck &>> /var/log/run.log
-        update-alternatives --remove-all  java-1.8.0-openjdk.x86_64 &>> /var/log/run.log
-        systemctl restart nexus-repository-manager.service
-      else
-        yum -y install nexus-repository-manager-3.68.1_02 --nogpgcheck &>> /var/log/run.log
-        wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
-        tar xf openjdk-17.0.2_linux-x64_bin.tar.gz
-        rm -f  openjdk-17.0.2_linux-x64_bin.tar.gz
-        mv jdk-17.0.2 /opt/
-        echo 'export JAVA_HOME=/opt/jdk-17.0.2' >>/etc/profile.d/jdk17.sh
-        echo 'export PATH=$PATH:$JAVA_HOME/bin' >>/etc/profile.d/jdk17.sh
-        echo /opt/jdk-17.0.2 >> /etc/jelastic/redeploy.conf
-        ln -sf /opt/jdk-17.0.2/bin/java /etc/alternatives/java
-        systemctl restart nexus-repository-manager.service
-      fi
+      mkdir -p /opt/sonatype && chown -R jelastic /opt/sonatype
       echo /opt/sonatype/ >> /etc/jelastic/redeploy.conf
-      until [[ -f /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties ]] ; do
-          sleep 1
-          echo '.'
-      done
-      chmod 664 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
-      usermod -a -G nexus3 jelastic
+      NEXUS_TAR="nexus-${globals.version_nexus}-linux-x86_64.tar.gz"
+      wget https://download.sonatype.com/nexus/3/${NEXUS_TAR} -O /tmp/${NEXUS_TAR} &>> /var/log/run.log
+      cd /opt/sonatype
+      tar xzf /tmp/${NEXUS_TAR} &>> /var/log/run.log
+      NEXUS_DIR=$(ls -d nexus-* | head -n 1)
+      ln -s /opt/sonatype/$NEXUS_DIR /opt/sonatype/nexus
+      wget ${baseUrl}/scripts/nexus.service -O /etc/systemd/system/nexus.service
+      systemctl daemon-reload
+      systemctl enable nexus.service
+      chown -R jelastic /opt/sonatype
     user: root
-    sayYes: true
+
+  setup-postgresql-connection:
+  - cmd[cp]: |-
+      cat >> /opt/sonatype/nexus/etc/nexus.properties <<EOF
+
+      # PostgreSQL Database Configuration
+      nexus.datastore.enabled=true
+      nexus.datastore.connectionUrl=jdbc:postgresql://sqldb:5432/nexus
+      nexus.datastore.username=${nodes.sqldb.user}
+      nexus.datastore.password=${nodes.sqldb.password}
+      nexus.datastore.maximumPoolSize=10
+      EOF
+      
+      sed -i 's|\#\s*application-host=.*|application-host=127.0.0.1|' /opt/sonatype/nexus/etc/nexus.properties
+      chmod 664 /opt/sonatype/nexus/etc/nexus.properties
+
   setup-nginx:
   - cmd[cp]: |-
       sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;|g' /etc/nginx/conf.d/sites-enabled/default.conf
       sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header X-Real-IP $remote_addr;|g' /etc/nginx/conf.d/sites-enabled/default.conf
       sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_set_header Host $host;|g' /etc/nginx/conf.d/sites-enabled/default.conf
       sed -i 's|index  index.html index.htm index.php;|index  index.html index.htm index.php;\n\n    proxy_pass http://localhost:8081/;|g' /etc/nginx/conf.d/sites-enabled/default.conf
-      sed -i 's|\#\s*application-host=.*|application-host=127.0.0.1|' /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
-      chown nexus3:nexus3 /opt/sonatype/sonatype-work/nexus3/etc/nexus.properties
+      systemctl start nexus.service
     user: root
-    sayYes: true
   - api [cp]: jelastic.environment.control.RestartNodes
-  - cmd [cp]: sleep 15
-
-addons:
-- id: update-nexus
-  name: Update Nexus Repository Manager
-  description: Update of Nexus
-  buttons:
-  - caption: Update
-    action: update
-    loadingText: Updating...
-    confirmText: Do you want to update Nexus?
-    successText: Nexus has been successfully updated!
-  actions:
-    update:
-    - log: launching nexus update JPS
-    - install: https://raw.githubusercontent.com/jelastic-jps/nexus/master/scripts/update-nexus.jps
-      skipEmail: true
+  - cmd [cp]: sleep 10
 
 success: text/success-email.md
